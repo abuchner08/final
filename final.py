@@ -26,8 +26,24 @@ def get_user_input():
 # makes a new list of movie titles that are on both genre and age 
 #returns list of movie names that are on the services the user has 
 
-# def filter_by_ratings()
-# returns top 10 movies that match everything 
+#def get_average_rating(movie)
+# gets the average rating from all the different rating sites 
+
+def filter_by_ratings(age, genre, service):
+    common = []
+    for movie in service:
+        if movie in age and movie in genre:
+            common.append(movie)
+    for movies in common:
+        # calculate the rating 
+        # make list of tuples with title and rating 
+        # sort by max rating 
+    #return top 10 or however many there are 
+    if len(common) == 0:
+        return service[0:10]
+
+# takes in the three lists that have already been made and return top movies that are in all three
+# returns top 10 movies or less if thats all there is that match everything 
 # has a bar chart that shows the ratings for the movies 
 
 # get_info():
