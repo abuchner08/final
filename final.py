@@ -8,9 +8,6 @@ def get_apikey(filename):
 
 def main():
 
-if __name__ == "__main__":
-    main()
-
 
 #database with movie id and title and box office money 
 #database with movie id and five videos 

@@ -1,23 +1,22 @@
 import requests 
 import sqlite3
 import json 
-import os
-#make database with movie id, title, and box office money 
 
 def get_api_key(file):
-    f = open(filename, 'r')
+    f = open(file, 'r')
     key = f.read().strip()
     return key 
 
 def get_data():
     apikey = get_api_key("apikeymovies")
-    reponse = requests.get(f"http://www.omdbapi.com/?apikey={apikey}&")
-    data = response.json()
+    response = requests.get(f"http://www.omdbapi.com/?apikey={apikey}&")
+    data = json.load(response.text)
+
+    return data
 
 def set_up_table(data):
     conn = sqlite3.connect('example.db')
     cursor = conn.cursor()
-    movie_data = []
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS movies (
     id INTEGER PRIMARY KEY,
@@ -26,7 +25,7 @@ def set_up_table(data):
     )
     ''')
     for movie in data:
-        #id = movie[]
+        id = movie["imdbID"]
         title = movie["Title"]
         Bo = movie["BoxOffice"]
 
@@ -35,3 +34,9 @@ def set_up_table(data):
         ''', (id, title, Bo))
 
     conn.commit()
+
+def main():
+    data = get_data()
+    set_up_table(data)
+
+main()
