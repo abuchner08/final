@@ -1,42 +1,49 @@
 import requests 
 import sqlite3
 import json 
+from apikeymovies import key
 
-def get_api_key(file):
-    f = open(file, 'r')
-    key = f.read().strip()
-    return key 
-
-def get_data():
-    apikey = get_api_key("apikeymovies")
-    response = requests.get(f"http://www.omdbapi.com/?apikey={apikey}&")
-    data = json.load(response.text)
-
-    return data
+def get_data(key):
+    moviels = ["Barbie", "Avatar", "Smile", "The Game", "Dodgeball", "Love Actually", "It", "Home Alone", "Room", "The Notebook", 
+               "Mean Girls", "Clueless", "Die Hard", "Titanic", "Epic", "Mummy", "Schndler's List", "Dead Poets Society", 
+               "Jaws", "Jerry Maguire", "Wonder", "Bring It On", "Lost", "Ghost", "Fight Club"]
+    ls = []
+    for movie in moviels:
+        params = {'t' : movie, 'apikey' : key}
+        response = requests.get(f"http://www.omdbapi.com/?", params=params)
+        data = response.json()
+        ls.append(data)
+    #print(ls)
+    return ls
 
 def set_up_table(data):
-    conn = sqlite3.connect('example.db')
+    conn = sqlite3.connect('movies.db')
     cursor = conn.cursor()
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS movies (
-    id INTEGER PRIMARY KEY,
+    id TEXT PRIMARY KEY,
     title TEXT, 
-    boxoffice INT
+    boxoffice INTEGER
     )
     ''')
+    #print(data)
     for movie in data:
-        id = movie["imdbID"]
-        title = movie["Title"]
-        Bo = movie["BoxOffice"]
+        #print(movie)
+        id = movie.get("imdbID")
+        title = movie.get("Title")
+        Bo = movie.get("BoxOffice", "").replace("$","").replace(",","")
+        print(id, title, Bo)
 
-        cursor.execute('''
-        INSERT INTO movies (id, title, Bo) VALUES (?,?,?)
-        ''', (id, title, Bo))
+        try:
+            cursor.execute('''
+            INSERT INTO movies (id, title, boxoffice) VALUES (?,?,?)
+            ''', (id, title, int(Bo)))
+        except:
+            print("error")
 
     conn.commit()
 
 def main():
-    data = get_data()
-    set_up_table(data)
+    set_up_table(get_data(key))
 
 main()
